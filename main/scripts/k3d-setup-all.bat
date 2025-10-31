@@ -6,13 +6,7 @@ k3d cluster create shop --api-port 6445 -p "80:80@loadbalancer"
 kubectl config use-context k3d-shop
 kubectl config set-cluster k3d-shop --server=https://127.0.0.1:6445
 
-for /l %%i in (1,1,60) do (
-  kubectl cluster-info >NUL 2>&1 && goto :ready
-  timeout /t 2 >NUL
-)
-:ready
-
-kubectl taint nodes k3d-shop-server-0 node-role.kubernetes.io/control-plane=true:NoSchedule 2>NUL
+k3d node create agent --cluster shop
 
 if exist "%K8S_DIR%\app.env" (
   kubectl create secret generic app-secrets --from-env-file="%K8S_DIR%\app.env" -o yaml --dry-run=client | kubectl apply -f -
@@ -26,7 +20,6 @@ kubectl set image deployment/web web=ghcr.io/gammasportshop/sportshop-web:latest
 kubectl rollout status deployment/api
 kubectl rollout status deployment/web
 
-kubectl get nodes -o wide
 kubectl get pods -A
 
 echo Open http://localhost
