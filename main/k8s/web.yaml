@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: ghcr.io/gammaSportShop/sportshop-web:latest
+          image: ghcr.io/gammasportshop/sportshop-web:latest
           ports:
             - containerPort: 80
 ---
@@ -35,7 +35,7 @@ kind: Ingress
 metadata:
   name: sportshop
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: traefik
 spec:
   rules:
     - http:

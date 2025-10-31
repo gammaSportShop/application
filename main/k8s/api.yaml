@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: ghcr.io/gammaSportShop/sportshop-api:latest
+          image: ghcr.io/gammasportshop/sportshop-api:latest
           ports:
             - containerPort: 3000
           envFrom:
