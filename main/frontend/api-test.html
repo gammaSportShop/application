@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Endpoint Tester</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #e6edf3;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #00d4aa;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-result {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+        .test-result:last-child {
+            border-bottom: none;
+        }
+        .status-pass { color: #00d4aa; }
+        .status-fail { color: #ff6b6b; }
+        .status-skip { color: #ffd93d; }
+        .endpoint {
+            font-family: 'Courier New', monospace;
+            background: #2a2a2a;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .summary {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .summary h2 {
+            color: #00d4aa;
+            margin-top: 0;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        button {
+            background: #00d4aa;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px auto;
+            display: block;
+        }
+        button:hover {
+            background: #00b894;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .loading {
+            text-align: center;
+            color: #ffd93d;
+        }
+        .error-details {
+            background: #2a1a1a;
+            border: 1px solid #ff6b6b;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #ff6b6b;
+        }
+        .response-data {
+            background: #1a2a1a;
+            border: 1px solid #00d4aa;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #00d4aa;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 API Endpoint Tester</h1>
+        
+        <button id="runTests" onclick="runAllTests()">Run All API Tests</button>
+        
+        <div id="results" style="display: none;">
+            <div class="summary" id="summary">
+                <h2>Test Results</h2>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number" id="passed">0</div>
+                        <div class="stat-label">Passed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="failed">0</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="skipped">0</div>
+                        <div class="stat-label">Skipped</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="testResults"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let authToken = null;
+        let cartId = null;
+        let testProduct = null;
+
+        async function makeRequest(endpoint, options = {}) {
+            const start = Date.now();
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
+                        ...options.headers
+                    }
+                });
+                const duration = Date.now() - start;
+                const data = await response.json().catch(() => null);
+                
+                return {
+                    endpoint,
+                    method: options.method || 'GET',
+                    status: response.ok ? 'PASS' : 'FAIL',
+                    statusCode: response.status,
+                    response: data,
+                    duration
+                };
+            } catch (error) {
+                return {
+                    endpoint,
+                    method: options.method || 'GET',
+                    status: 'FAIL',
+                    error: error.message,
+                    duration: Date.now() - start
+                };
+            }
+        }
+
+        function addResult(result) {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'test-result';
+            
+            const statusClass = `status-${result.status.toLowerCase()}`;
+            const statusIcon = result.status === 'PASS' ? '✅' : result.status === 'FAIL' ? '❌' : '⏭️';
+            
+            resultDiv.innerHTML = `
+                <span class="${statusClass}">${statusIcon}</span>
+                <span class="endpoint">${result.method} ${result.endpoint}</span>
+                <span class="${statusClass}">${result.statusCode ? `(${result.statusCode})` : ''}</span>
+                <span style="color: #666;">${result.duration ? `${result.duration}ms` : ''}</span>
+                ${result.error ? `<div class="error-details">Error: ${result.error}</div>` : ''}
+                ${result.response ? `<div class="response-data">Response: ${JSON.stringify(result.response, null, 2)}</div>` : ''}
+            `;
+            
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        async function runAllTests() {
+            const button = document.getElementById('runTests');
+            const resultsDiv = document.getElementById('results');
+            const testResultsDiv = document.getElementById('testResults');
+            
+            button.disabled = true;
+            button.textContent = 'Running Tests...';
+            resultsDiv.style.display = 'block';
+            testResultsDiv.innerHTML = '';
+            
+            // Reset counters
+            document.getElementById('passed').textContent = '0';
+            document.getElementById('failed').textContent = '0';
+            document.getElementById('skipped').textContent = '0';
+            
+            console.log('🧪 Starting API Tests...');
+
+            // 1. Auth Tests
+            console.log('🔐 Testing Auth endpoints...');
+            
+            addResult(await makeRequest('/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({
+                    email: 'test@example.com',
+                    password: 'password123',
+                    name: 'Test User'
+                })
+            }));
+
+            const loginResult = await makeRequest('/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({
+                    email: 'test@example.com',
+                    password: 'password123'
+                })
+            });
+            addResult(loginResult);
+            
+            if (loginResult.status === 'PASS' && loginResult.response?.token) {
+                authToken = loginResult.response.token;
+            }
+
+            // 2. Catalog Tests
+            console.log('📦 Testing Catalog endpoints...');
+            
+            addResult(await makeRequest('/catalog/categories'));
+            addResult(await makeRequest('/catalog/meta'));
+            addResult(await makeRequest('/catalog/products'));
+            addResult(await makeRequest('/catalog/products?page=1&pageSize=5'));
+            addResult(await makeRequest('/catalog/products?q=test'));
+            addResult(await makeRequest('/catalog/products?priceMin=10&priceMax=100'));
+            addResult(await makeRequest('/catalog/products?sort=price_asc'));
+            addResult(await makeRequest('/catalog/collections'));
+
+            // Get a product for further tests
+            const productsResult = await makeRequest('/catalog/products?pageSize=1');
+            addResult(productsResult);
+            if (productsResult.status === 'PASS' && productsResult.response?.items?.[0]) {
+                testProduct = productsResult.response.items[0];
+                addResult(await makeRequest(`/catalog/products/${testProduct.slug}`));
+            }
+
+            // 3. Cart Tests
+            console.log('🛒 Testing Cart endpoints...');
+            
+            const cartInitResult = await makeRequest('/cart/init', { method: 'POST' });
+            addResult(cartInitResult);
+            
+            if (cartInitResult.status === 'PASS' && cartInitResult.response?.cartId) {
+                cartId = cartInitResult.response.cartId;
+                
+                addResult(await makeRequest(`/cart/${cartId}`));
+                
+                if (testProduct) {
+                    addResult(await makeRequest(`/cart/${cartId}/items`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            productId: testProduct.id,
+                            quantity: 2
+                        })
+                    }));
+                    
+                    addResult(await makeRequest(`/cart/${cartId}`));
+                    
+                    addResult(await makeRequest(`/cart/${cartId}/items`, {
+                        method: 'PATCH',
+                        body: JSON.stringify({
+                            productId: testProduct.id,
+                            quantity: 1
+                        })
+                    }));
+                    
+                    addResult(await makeRequest(`/cart/${cartId}`));
+                }
+            }
+
+            // 4. Orders Tests (require auth)
+            console.log('📋 Testing Orders endpoints...');
+            
+            if (authToken && cartId && testProduct) {
+                // First add item to cart and checkout
+                await makeRequest(`/cart/${cartId}/items`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        productId: testProduct.id,
+                        quantity: 1
+                    })
+                });
+                
+                const checkoutResult = await makeRequest(`/cart/${cartId}/checkout`, { 
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                addResult(checkoutResult);
+                
+                if (checkoutResult.status === 'PASS' && checkoutResult.response?.order) {
+                    const orderId = checkoutResult.response.order.id;
+                    
+                    addResult(await makeRequest('/orders', {
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    }));
+                    addResult(await makeRequest(`/orders/${orderId}`, {
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    }));
+                    addResult(await makeRequest(`/orders/${orderId}/status`, {
+                        method: 'PATCH',
+                        headers: { 'Authorization': `Bearer ${authToken}` },
+                        body: JSON.stringify({ status: 'PAID' })
+                    }));
+                }
+            } else {
+                addResult({
+                    endpoint: '/orders/*',
+                    method: 'GET',
+                    status: 'SKIP',
+                    error: 'No auth token or cart setup'
+                });
+            }
+
+            // 5. Error Cases
+            console.log('❌ Testing error cases...');
+            
+            addResult(await makeRequest('/catalog/products/invalid-slug'));
+            addResult(await makeRequest('/cart/invalid-uuid'));
+            addResult(await makeRequest('/orders/999999'));
+            
+            if (authToken) {
+                addResult(await makeRequest('/orders/999999', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                }));
+            }
+
+            // Update summary
+            const allResults = Array.from(document.querySelectorAll('.test-result'));
+            const passed = allResults.filter(r => r.querySelector('.status-pass')).length;
+            const failed = allResults.filter(r => r.querySelector('.status-fail')).length;
+            const skipped = allResults.filter(r => r.querySelector('.status-skip')).length;
+            
+            document.getElementById('passed').textContent = passed;
+            document.getElementById('failed').textContent = failed;
+            document.getElementById('skipped').textContent = skipped;
+
+            console.log('✅ API Tests completed!');
+            button.disabled = false;
+            button.textContent = 'Run All API Tests';
+        }
+    </script>
+</body>
+</html>

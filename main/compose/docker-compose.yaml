@@ -1,0 +1,63 @@
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MARIADB_DATABASE: ${DB_NAME:-sportshop}
+      MARIADB_USER: ${DB_USER:-shop}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-shop}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MARIADB_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - backend
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    environment:
+      PORT: 3000
+      DATABASE_URL: mysql://${DB_USER:-shop}:${DB_PASSWORD:-shop}@db:3306/${DB_NAME:-sportshop}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-devsecret}
+      SEED_DEMO: ${SEED_DEMO:-true}
+    depends_on:
+      db:
+        condition: service_started
+      redis:
+        condition: service_started
+    networks:
+      - backend
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ..
+      dockerfile: docker/web.Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+      - backend
+
+volumes:
+  db_data:
+
+networks:
+  frontend:
+  backend:
+
+

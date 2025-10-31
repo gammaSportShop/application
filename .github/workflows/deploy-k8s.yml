@@ -1,0 +1,35 @@
+name: deploy-k8s
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - kursovaya/k8s/**
+      - .github/workflows/deploy-k8s.yml
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      REG_NS: ghcr.io/gammasportshop
+      SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${KUBE_CONFIG_DATA}" | base64 -d > $HOME/.kube/config
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+      - name: Apply manifests
+        run: kubectl apply -f main/k8s/
+      - name: Update images
+        run: |
+          kubectl set image deployment/api api=$REG_NS/sportshop-api:$SHA
+          kubectl set image deployment/web web=$REG_NS/sportshop-web:$SHA
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/api
+          kubectl rollout status deployment/web
+
