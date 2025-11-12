@@ -8,15 +8,16 @@ permissions:
   contents: read
 jobs:
   deploy:
-    # Run on manual dispatch OR when build completed successfully
     if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     env:
       REG_NS: ghcr.io/gammasportshop
+      CHECK_URL: ${{ vars.WEB_CHECK_URL || secrets.WEB_CHECK_URL }}
+      CHECK_CONTAINS: ${{ vars.WEB_CHECK_CONTAINS || secrets.WEB_CHECK_CONTAINS }}
     steps:
       - uses: actions/checkout@v4
         with:
-          # Checkout the exact commit that triggered the build, if available
+
           ref: ${{ github.event.workflow_run.head_sha }}
       - name: Configure kubectl
         run: |
@@ -42,4 +43,50 @@ jobs:
         run: |
           kubectl rollout status deployment/api
           kubectl rollout status deployment/web
+      - name: Collect deploy status and logs
+        run: |
+          kubectl get pods -A -o wide > k8s-pods.txt
+          kubectl describe deployment/api > describe-deploy-api.txt
+          kubectl describe deployment/web > describe-deploy-web.txt
+          kubectl logs deployment/api --tail=300 > logs-api.txt || true
+          kubectl logs deployment/web --tail=300 > logs-web.txt || true
+      - name: Upload logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: k8s-logs-${{ env.SHA || github.sha }}
+          path: |
+            k8s-pods.txt
+            describe-deploy-api.txt
+            describe-deploy-web.txt
+            logs-api.txt
+            logs-web.txt
+      - name: HTTP health check
+        if: ${{ env.CHECK_URL != '' }}
+        shell: bash
+        run: |
+          echo "Checking $CHECK_URL"
+          tries=20
+          ok=0
+          for i in $(seq 1 $tries); do
+            code=$(curl -sk -o body.txt -w "%{http_code}" "$CHECK_URL" || true)
+            echo "Attempt $i: HTTP $code"
+            if [ "$code" = "200" ]; then
+              if [ -n "$CHECK_CONTAINS" ]; then
+                if grep -qi -- "$CHECK_CONTAINS" body.txt; then ok=1; break; fi
+              else
+                ok=1; break
+              fi
+            fi
+            sleep 3
+          done
+          if [ $ok -ne 1 ]; then
+            echo "HTTP check failed"
+            exit 1
+          fi
+      - name: Upload HTTP body
+        if: ${{ env.CHECK_URL != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: http-body-${{ env.SHA || github.sha }}
+          path: body.txt
 
