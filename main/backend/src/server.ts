@@ -5,6 +5,7 @@ import cartRoutes from './routes/cart'
 import ordersRoutes from './routes/orders'
 import { rateLimit } from './plugins/rateLimit'
 import { seedDemo } from './seed'
+import metricsRoutes from './routes/metrics'
 
 const app = Fastify({ logger: true })
 
@@ -16,6 +17,7 @@ app.register(authRoutes, { prefix: '/api/auth' })
 app.register(catalogRoutes, { prefix: '/api/catalog' })
 app.register(cartRoutes, { prefix: '/api/cart' })
 app.register(ordersRoutes, { prefix: '/api/orders' })
+app.register(metricsRoutes, { prefix: '/api/metrics' })
 
 const port = parseInt(process.env.PORT || '3000')
 app.listen({ port, host: '0.0.0.0' }).then(async () => {

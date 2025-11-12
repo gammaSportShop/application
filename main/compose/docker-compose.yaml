@@ -41,6 +41,22 @@ services:
       - backend
     restart: unless-stopped
 
+  metrics:
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    command: ["node","dist/metricsWorker.js"]
+    environment:
+      DATABASE_URL: mysql://${DB_USER:-shop}:${DB_PASSWORD:-shop}@db:3306/${DB_NAME:-sportshop}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-devsecret}
+    depends_on:
+      redis:
+        condition: service_started
+    networks:
+      - backend
+    restart: unless-stopped
+
   web:
     build:
       context: ..

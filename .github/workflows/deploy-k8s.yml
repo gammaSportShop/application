@@ -1,27 +1,37 @@
 name: deploy-k8s
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
-    paths:
-      - kursovaya/k8s/**
-      - .github/workflows/deploy-k8s.yml
+  workflow_run:
+    workflows: [ "build" ]
+    types: [ completed ]
 permissions:
   contents: read
 jobs:
   deploy:
+    # Run on manual dispatch OR when build completed successfully
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     env:
       REG_NS: ghcr.io/gammasportshop
-      SHA: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Checkout the exact commit that triggered the build, if available
+          ref: ${{ github.event.workflow_run.head_sha }}
       - name: Configure kubectl
         run: |
           mkdir -p $HOME/.kube
           echo "${KUBE_CONFIG_DATA}" | base64 -d > $HOME/.kube/config
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+      - name: Determine image SHA
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.workflow_run.head_sha }}" ]; then
+            echo "SHA=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_ENV
+          else
+            echo "SHA=${{ github.sha }}" >> $GITHUB_ENV
+          fi
       - name: Apply manifests
         run: kubectl apply -f main/k8s/
       - name: Update images

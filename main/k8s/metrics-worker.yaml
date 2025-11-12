@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metrics-worker
+  template:
+    metadata:
+      labels:
+        app: metrics-worker
+    spec:
+      containers:
+        - name: metrics-worker
+          image: ghcr.io/gammasportshop/sportshop-api:latest
+          command: ["node","dist/metricsWorker.js"]
+          envFrom:
+            - secretRef:
+                name: app-secrets
