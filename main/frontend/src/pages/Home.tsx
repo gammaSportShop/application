@@ -36,7 +36,7 @@ export default function Home() {
                 <DotField className="absolute inset-0 opacity-20 pointer-events-none" />
                 <div className="hero-content text-center">
                     <div className="max-w-2xl">
-                        <h1 className="hero-title">HELLO WORLD!</h1>
+                        <h1 className="hero-title">СПОРТ БЕЗ КОМПРОМИССОВ</h1>
                         <p className="opacity-80 mb-6">Экипировка и одежда с акцентом на качество и стиль.</p>
                         <a href="/catalog" className="btn btn-primary">В КАТАЛОГ</a>
                     </div>
