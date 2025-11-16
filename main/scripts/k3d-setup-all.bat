@@ -12,7 +12,7 @@ if exist "%K8S_DIR%\app.env" (
   kubectl create secret generic app-secrets --from-env-file="%K8S_DIR%\app.env" -o yaml --dry-run=client | kubectl apply -f -
 )
 
-kubectl apply -f "%K8S_DIR%"
+kubectl apply -k "%K8S_DIR%"
 
 kubectl set image deployment/api api=ghcr.io/gammasportshop/sportshop-api:latest
 kubectl set image deployment/web web=ghcr.io/gammasportshop/sportshop-web:latest
