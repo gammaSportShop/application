@@ -25,20 +25,3 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  healthChecks:
-    - apiVersion: v1
-      kind: Secret
-      name: app-secrets
-      namespace: default
-    - apiVersion: v1
-      kind: Service
-      name: api
-      namespace: default
-    - apiVersion: v1
-      kind: Service
-      name: db
-      namespace: default
-    - apiVersion: v1
-      kind: Service
-      name: redis
-      namespace: default
