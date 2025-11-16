@@ -71,13 +71,13 @@ export default {
 		plugin(function ({ addBase, addComponents, addUtilities, theme }) {
 			addBase({
 				':root': {
-                    '--c-primary': '96 165 250',
+                    '--c-primary': '37 99 235',
 					'--c-bg': '10 10 10',
 					'--c-bg-alt': '26 26 26',
 					'--c-bg-inner': '30 30 30',
 					'--c-border': '44 44 44',
 					'--c-border-light': '75 85 99',
-                    '--c-border-accent': '96 165 250',
+                    '--c-border-accent': '37 99 235',
 					'--c-text': '230 237 243',
 					'--c-text-alt': '125 181 144',
 					'--c-text-muted': '156 163 175',

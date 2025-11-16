@@ -1,41 +1,60 @@
 # Container Platform Analysis
 
 ## Goals
-- Reliable single-node dev with Docker Compose
-- Simple clustering path with Docker Swarm
-- Production-grade orchestration with Kubernetes
 
-## Docker Swarm
-- Simpler operational model than Kubernetes
-- Overlay networks for service-to-service communication
-- Declarative `stack.yaml` with replicas
-- Suitable for small clusters and student lab setups
+- Reliable single-node development with Docker Compose.
+- Simple GitOps-based deployment to Kubernetes using FluxCD.
+- Production-like orchestration with Kubernetes primitives (Deployments, StatefulSet, PVC, Ingress).
 
-Limitations
-- Smaller ecosystem than Kubernetes
-- Fewer built-in primitives (no CRDs, fewer controllers)
+## Current Platform Choice
+
+The current project primarily targets:
+- **Local development** with Docker Compose.
+- **Kubernetes** as the main orchestration platform.
+- **FluxCD** for GitOps-style synchronization of manifests from this repository.
+
+Docker Swarm is no longer a first-class target in this codebase (no Swarm stack files are present).
 
 ## Kubernetes
-- Strong ecosystem, standardized APIs, portability across clouds
-- Workloads: Deployments, StatefulSets (MariaDB), Services, Ingress
-- Config separation via Secrets/ConfigMaps
-- Storage via PersistentVolumeClaim (MariaDB data)
 
-Operational Considerations
-- Requires cluster and Ingress controller (e.g., NGINX Ingress)
-- CI deployment via kubectl using KUBECONFIG secret
+- Workloads:
+  - Deployments: `api`, `web`, `redis`, `metrics-worker`.
+  - StatefulSet: `db` (MariaDB).
+  - Services: ClusterIP for `api`, `web`, `db`, `redis`.
+  - Ingress: `sportshop` Ingress routes `/` to `web` and `/api` to `api`.
+- Configuration separation:
+  - Secrets via `k8s/secrets.yaml` and `app-secrets` (JWT, DB credentials, etc.).
+  - Config via `k8s/app.env` and env vars in manifests.
+- Storage:
+  - `db` uses a PersistentVolumeClaim (5Gi) and StatefulSet to maintain identity and durable data.
 
-## Networking Model
-- Swarm: overlay networks `frontend` and `backend`
-- K8s: ClusterIP Services for `api`, `web`, `db`, `redis`; Ingress routes `/` to `web` and `/api` to `api`
+### Operational Considerations
 
-## Storage
-- MariaDB uses PVC (5Gi) and a StatefulSet for stable identity
+- Requires:
+  - A Kubernetes cluster (local or cloud).
+  - An Ingress controller (Traefik is assumed via `kubernetes.io/ingress.class: traefik`).
+- CI/CD:
+  - Container images are published to GHCR (e.g., `ghcr.io/gammasportshop/sportshop-api` and `sportshop-web`).
+  - FluxCD (`k8s/flux-system`) can be configured in the cluster to watch this repo and apply updates automatically.
 
-## CI/CD
-- GitHub Actions builds multi-platform images with Buildx and pushes to GHCR
-- Post-build step applies K8s manifests using a base64-encoded kubeconfig secret
+## Docker Compose
+
+- Provides a self-contained, single-node environment:
+  - `db` (MariaDB) with a named volume.
+  - `redis` (Redis 7).
+  - `api` (Fastify + Prisma backend).
+  - `metrics` worker (same image as `api` with different command).
+  - `web` (NGINX + compiled SPA).
+- Uses two overlay networks:
+  - `frontend` for the web entrypoint.
+  - `backend` for internal communication between `api`, `db`, `redis`, and `web`.
 
 ## Security Notes
-- JWT secret in K8s Secret, never in image
-- DB credentials in Secret for K8s; in Compose via env
+
+- Secrets:
+  - JWT secret and DB credentials are injected via environment variables.
+  - In Kubernetes, these live in Secrets and are referenced via `envFrom` / `secretRef`.
+  - Secrets are not baked into images.
+- API:
+  - JWT-based authentication; tokens are expected to be handled carefully on the client side.
+

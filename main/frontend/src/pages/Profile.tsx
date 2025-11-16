@@ -76,38 +76,37 @@ export default function ProfilePage() {
 	}
 
     return (
-        <div className="min-h-screen">
-            <div className="grid lg:grid-cols-2">
-                <div className="flex items-center justify-center p-8 bg-bg-alt">
-					<div className="w-full max-w-md">
-						<div className="text-center mb-8">
-							<h1 className="text-3xl font-bold mb-2"><span className="text-green-500">g</span>amma<span className="text-primary">S</span>port</h1>
-						</div>
-						
-						<div className="card-panel p-8">
-                            <h2 className="text-2xl font-bold uppercase tracking-wide mb-2" data-enter>
-								{tab === 'login' ? 'ВХОД В АККАУНТ' : 'СОЗДАЙТЕ АККАУНТ'}
-							</h2>
-							<p className="text-sm opacity-70 mb-6">
-								{tab === 'login' 
-									? 'Войдите в свой аккаунт чтобы участвовать в соревнованиях и получать результаты.'
-									: 'Создайте аккаунт чтобы участвовать в соревнованиях, получать призы, и что то еще.'
-								}
-							</p>
-							
-							<div role="tablist" className="tabs tabs-boxed mb-6">
-								<button role="tab" className={`tab ${tab==='login'?'tab-active':''}`} onClick={()=>setTab('login')}>ВХОД</button>
-								<button role="tab" className={`tab ${tab==='register'?'tab-active':''}`} onClick={()=>setTab('register')}>РЕГИСТРАЦИЯ</button>
-							</div>
-							
-							{tab === 'login' ? (
-                                <form className="space-y-4" onSubmit={(e)=>{e.preventDefault(); submitLogin()}} data-enter aria-busy={submitting}>
-                                    <label className="form-control">
+        <div className="login-main px-4">
+            <div className="w-full max-w-6xl grid lg:grid-cols-2 items-stretch">
+                <div className="flex items-center justify-center p-8 bg-bg-alt rounded-box">
+                    <div className="w-full max-w-md">
+                        <div className="text-center mb-8">
+                            <h1 className="text-3xl font-bold mb-2"><span className="text-green-500">g</span>amma<span className="text-primary">S</span>port</h1>
+                        </div>
+                        <div className="card-panel p-8">
+                            <div className="flex flex-col gap-4 mb-6" data-enter>
+                                <h2 className="text-2xl font-bold uppercase tracking-wide">
+                                    {tab === 'login' ? 'ВХОД В АККАУНТ' : 'СОЗДАЙТЕ АККАУНТ'}
+                                </h2>
+                                <p className="text-sm opacity-70 leading-relaxed">
+                                    {tab === 'login' 
+                                        ? 'Войдите в свой аккаунт чтобы участвовать в соревнованиях и получать результаты.'
+                                        : 'Создайте аккаунт чтобы участвовать в соревнованиях, получать призы, и что то еще.'
+                                    }
+                                </p>
+                                <div role="tablist" className="tabs tabs-boxed">
+                                    <button role="tab" className={`tab ${tab==='login'?'tab-active':''}`} onClick={()=>setTab('login')}>ВХОД</button>
+                                    <button role="tab" className={`tab ${tab==='register'?'tab-active':''}`} onClick={()=>setTab('register')}>РЕГИСТРАЦИЯ</button>
+                                </div>
+                            </div>
+                            {tab === 'login' ? (
+                                <form className="space-y-5" onSubmit={(e)=>{e.preventDefault(); submitLogin()}} data-enter aria-busy={submitting}>
+                                    <label className="form-control block">
                                         <div className="label"><span className="label-text uppercase">Email</span></div>
                                         <input className={`input-text w-full ${email && !emailValid ? 'border-negative' : ''}`} type="email" placeholder="email@example.com" value={email} onChange={(e)=>setEmail(e.target.value)} required autoComplete="email" autoFocus />
                                         {!emailValid && email.length > 0 && <div className="text-caption text-negative mt-1">Введите корректный email</div>}
                                     </label>
-                                    <label className="form-control">
+                                    <label className="form-control block">
                                         <div className="label"><span className="label-text uppercase">Пароль</span></div>
                                         <div className="relative">
                                             <input 
@@ -134,18 +133,18 @@ export default function ProfilePage() {
                                     </button>
                                 </form>
                             ) : (
-                                <form className="space-y-4" onSubmit={(e)=>{e.preventDefault(); submitRegister()}} data-enter aria-busy={submitting}>
-                                    <label className="form-control">
+                                <form className="space-y-5" onSubmit={(e)=>{e.preventDefault(); submitRegister()}} data-enter aria-busy={submitting}>
+                                    <label className="form-control block">
                                         <div className="label"><span className="label-text uppercase">Имя</span></div>
                                         <input className={`input-text w-full ${name && !nameValid ? 'border-negative' : ''}`} placeholder="Ваше имя" value={name} onChange={(e)=>setName(e.target.value)} autoComplete="name" />
                                         {!nameValid && name.length > 0 && <div className="text-caption text-negative mt-1">Минимум 2 символа</div>}
                                     </label>
-                                    <label className="form-control">
+                                    <label className="form-control block">
                                         <div className="label"><span className="label-text uppercase">Email</span></div>
                                         <input className={`input-text w-full ${email && !emailValid ? 'border-negative' : ''}`} type="email" placeholder="email@example.com" value={email} onChange={(e)=>setEmail(e.target.value)} required autoComplete="email" />
                                         {!emailValid && email.length > 0 && <div className="text-caption text-negative mt-1">Введите корректный email</div>}
                                     </label>
-                                    <label className="form-control">
+                                    <label className="form-control block">
                                         <div className="label"><span className="label-text uppercase">Пароль</span></div>
                                         <div className="relative">
                                             <input 
@@ -170,7 +169,6 @@ export default function ProfilePage() {
                                     <button className="btn btn-primary w-full uppercase disabled:opacity-60 mt-3" type="submit" disabled={submitting || !formValid}>СОЗДАТЬ АККАУНТ</button>
                                 </form>
                             )}
-                            
                             <div className="mt-6 space-y-4" data-enter>
                                 <div className="flex justify-between text-sm">
                                     <button className="text-primary hover:underline" type="button">Забыли пароль?</button>
@@ -179,24 +177,22 @@ export default function ProfilePage() {
                                     </button>
                                 </div>
                             </div>
-                            
                             {message && <div className="alert mt-4" data-enter><span>{message}</span></div>}
-						</div>
-					</div>
-				</div>
-				
-                <div className="hidden lg:block relative bg-bg-alt">
+                        </div>
+                    </div>
+                </div>
+                <div className="hidden lg:block relative bg-bg-alt rounded-box ml-4">
                     <DotField className="absolute inset-0 opacity-20 pointer-events-none" />
                     <div className="relative z-10 flex items-center justify-center h-full">
-						<div className="text-center text-white">
-							<div className="text-6xl font-bold mb-4"><span className="text-green-500">g</span>amma<span className="text-primary">S</span>port</div>
+                        <div className="text-center text-white">
+                            <div className="text-6xl font-bold mb-4"><span className="text-green-500">g</span>amma<span className="text-primary">S</span>port</div>
                             <p className="text-lg opacity-70">Вдохновляющий фон без конфликтов по цвету</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
 
 

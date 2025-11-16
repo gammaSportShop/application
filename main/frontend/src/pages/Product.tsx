@@ -363,7 +363,7 @@ export default function ProductPage() {
 			</div>
 
 			{recommendedProducts.length > 0 && (
-				<div className="mt-16 max-w-6xl mx-auto">
+				<div className="mt-16">
 					<h2 className="text-3xl font-bold uppercase tracking-wide mb-8">РЕКОМЕНДУЕМЫЕ ТОВАРЫ</h2>
 				<div className="grid-products">
 						{recommendedProducts.slice(0, 3).map((p: any) => (
@@ -392,7 +392,7 @@ export default function ProductPage() {
 				</div>
 			)}
 
-            <div className="mt-16 max-w-6xl mx-auto">
+            <div className="mt-16">
                 <h2 className="text-3xl font-bold uppercase tracking-wide mb-8">ДРУГИЕ ТОВАРЫ</h2>
                 <div className="grid-products">
                     {randomProducts.map((p: any) => (

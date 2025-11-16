@@ -9,8 +9,8 @@
   --c-text-muted: 156 163 175;
   --c-border: 44 44 44;
   --c-border-light: 75 85 99;
-  --c-border-accent: 96 165 250;
-  --c-primary: 96 165 250;
+  --c-border-accent: 37 99 235;
+  --c-primary: 37 99 235;
   --c-positive: 50 232 117;
   --c-negative: 237 15 78;
   --radius-sm: 6px;
@@ -55,6 +55,14 @@ body {
 
   .site-main {
     @apply flex-1;
+  }
+
+  .login-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    min-height: calc(100vh - 62px);
   }
 
   .site-container {
@@ -223,11 +231,15 @@ body {
   }
 
   .btn-primary {
-    @apply bg-primary/20 text-primary border border-primary/40;
+    color: rgb(var(--c-primary));
+    border-color: rgb(var(--c-primary) / 0.4);
+    background-color: rgb(var(--c-primary) / 0.2);
   }
 
   .btn-primary:hover {
-    @apply bg-primary/30 text-primary border border-primary;
+    color: rgb(var(--c-primary));
+    border-color: rgb(var(--c-primary));
+    background-color: rgb(var(--c-primary) / 0.3);
   }
 
   .btn-ghost {
