@@ -5,7 +5,7 @@ OWNER="${1:-}"
 REPOSITORY="${2:-}"
 BRANCH="${3:-main}"
 K8S_PATH="${4:-main/k8s}"
-ORG="${5:-}"
+PERSONAL="${5:-}"
 
 if [ -z "${GITHUB_TOKEN:-}" ]; then
   echo "GITHUB_TOKEN is not set" >&2
@@ -23,10 +23,8 @@ if [ -z "$OWNER" ] || [ -z "$REPOSITORY" ]; then
   REPOSITORY="${REPOSITORY:-$(printf "%s" "$cleaned" | cut -d/ -f2)}"
 fi
 
-args=(bootstrap github --owner "$OWNER" --repository "$REPOSITORY" --branch "$BRANCH" --path "$K8S_PATH")
-if [ -z "$ORG" ]; then
-  args+=(--personal)
-fi
+args=(bootstrap github --owner "$OWNER" --repository "$REPOSITORY" --branch "$BRANCH" --path "$K8S_PATH" --token-auth)
+if [ -n "$PERSONAL" ]; then args+=(--personal); fi
 
 flux "${args[@]}"
 
