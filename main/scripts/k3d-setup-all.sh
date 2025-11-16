@@ -17,10 +17,18 @@ kubectl apply -f "$K8S_DIR"
 
 kubectl set image deployment/api api=ghcr.io/gammasportshop/sportshop-api:latest
 kubectl set image deployment/web web=ghcr.io/gammasportshop/sportshop-web:latest
+kubectl set image deployment/metrics-worker metrics-worker=ghcr.io/gammasportshop/sportshop-api:latest
 
 kubectl rollout status deployment/api
 kubectl rollout status deployment/web
+kubectl rollout status deployment/metrics-worker
 
 kubectl get pods -A
 
 echo Open http://localhost
+
+if command -v flux >/dev/null 2>&1 && [ -n "${GITHUB_TOKEN:-}" ]; then
+  "$SCRIPT_DIR/flux-bootstrap.sh"
+else
+  echo "Skipping Flux bootstrap: flux not found or GITHUB_TOKEN not set"
+fi
