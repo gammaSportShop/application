@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: ghcr.io/gammasportshop/sportshop-web:v0.0.15
+          image: ghcr.io/gammasportshop/sportshop-web:v0.0.17
           ports:
             - containerPort: 80
 ---
