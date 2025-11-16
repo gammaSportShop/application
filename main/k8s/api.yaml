@@ -18,7 +18,7 @@ spec:
           command: ['sh', '-c', 'until nc -z db 3306; do echo waiting for db; sleep 2; done']
       containers:
         - name: api
-          image: ghcr.io/gammasportshop/sportshop-api:v0.0.11
+          image: ghcr.io/gammasportshop/sportshop-api:v0.0.12
           ports:
             - containerPort: 3000
           envFrom:
@@ -39,3 +39,6 @@ spec:
     - port: 3000
       targetPort: 3000
       protocol: TCP
+  template:
+    spec:
+      containers: []
