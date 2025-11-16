@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: metrics-worker
-          image: ghcr.io/gammasportshop/sportshop-api:v0.0.13
+          image: ghcr.io/gammasportshop/sportshop-api:v0.0.14
           command: ["node", "dist/metricsWorker.js"]
           envFrom:
             - secretRef:
