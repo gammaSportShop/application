@@ -37,6 +37,8 @@ body {
   height: 100%;
   margin: 0;
   box-sizing: border-box;
+  background-color: rgb(var(--c-bg));
+  color: rgb(var(--c-text));
 }
 
 *, *::before, *::after {
@@ -203,19 +205,7 @@ body {
   }
 
   .card-panel:hover .card-title {
-    text-shadow: 0 0 10px rgba(var(--c-primary), 0.4);
   }
-
-  .btn-primary::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(120px 60px at var(--mx,50%) 0%, rgba(var(--c-primary)/0.35), transparent 60%);
-    opacity: 0;
-    transition: opacity .2s ease;
-    pointer-events: none;
-  }
-  .btn-primary:hover::after { opacity: 1; }
 
   .marquee {
     position: relative;
@@ -233,12 +223,11 @@ body {
   }
 
   .btn-primary {
-
-    @apply bg-blue-600/20 text-blue-400 border border-blue-600/40;
+    @apply bg-primary/20 text-primary border border-primary/40;
   }
 
   .btn-primary:hover {
-    @apply bg-blue-600/30 text-blue-400 border border-blue-600;
+    @apply bg-primary/30 text-primary border border-primary;
   }
 
   .btn-ghost {
@@ -370,9 +359,7 @@ body {
 }
 
 .animate-flow-pulse {
-  background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
-  background-size: 200% 200%;
-  animation: flow-pulse 2s ease infinite;
+  background-color: rgb(var(--c-primary));
 }
 
 .step-line {
@@ -384,13 +371,11 @@ body {
 }
 
 .step-line-active {
-  background: linear-gradient(90deg, #3b82f6, #60a5fa);
-  background-size: 200% 200%;
-  animation: flow-pulse 2s ease infinite;
+  background-color: rgb(var(--c-primary));
 }
 
 .step-line-completed {
-  background-color: #3b82f6;
+  background-color: rgb(var(--c-primary));
 }
 
 .step-line-inactive {
@@ -406,95 +391,24 @@ body {
   justify-content: center;
   position: relative;
   z-index: 1;
-  background: radial-gradient(closest-side at 50% 50%, #1f2937 60%, #111827 100%);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  backface-visibility: hidden;
-  transform: translateZ(0);
+  background-color: rgb(var(--c-bg-inner));
 }
 
 .step-circle-active {
-  color: #3b82f6;
-  background: radial-gradient(closest-side at 50% 50%, rgba(59,130,246,0.18) 0%, rgba(59,130,246,0.08) 60%, rgba(17,24,39,0.4) 100%);
-}
-.step-circle-active::before {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  background: radial-gradient(closest-side at 50% 50%, rgba(59,130,246,0.35), rgba(59,130,246,0) 70%);
-  filter: blur(0.4px);
-  pointer-events: none;
-}
-.step-circle-active::after {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: 50%;
-  --bw: 3px;
-  background:
-    linear-gradient(to right, rgba(96,165,250,0) 0%, rgba(96,165,250,0.85) 65%, rgba(96,165,250,1) 100%) 100% 0/50% 100% no-repeat,
-    linear-gradient(to right, rgba(59,130,246,0.6) 50%, rgba(59,130,246,0) 95%) 0 0/50% 100% no-repeat;
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--bw)), #000 calc(100% - var(--bw)));
-          mask: radial-gradient(farthest-side, transparent calc(100% - var(--bw)), #000 calc(100% - var(--bw)));
-  animation: spin-rotate 1.1s linear infinite;
-  will-change: transform;
+  color: rgb(var(--c-primary));
+  background-color: rgb(var(--c-bg-inner));
+  border: 2px solid rgb(var(--c-primary));
 }
 
 .step-circle-completed {
-  background: radial-gradient(closest-side at 50% 50%, #3b82f6 45%, #2563eb 100%);
+  background-color: rgb(var(--c-primary));
   color: white;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.06) inset, 0 0 10px rgba(59,130,246,0.25);
 }
 
 .step-circle-warning {
   color: #eab308;
-  background: radial-gradient(closest-side at 50% 50%, rgba(234,179,8,0.18) 0%, rgba(234,179,8,0.08) 60%, rgba(17,24,39,0.4) 100%);
-}
-.step-circle-warning::before {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  background: radial-gradient(closest-side at 50% 50%, rgba(234,179,8,0.35), rgba(234,179,8,0) 70%);
-  filter: blur(0.4px);
-  pointer-events: none;
-}
-.step-circle-warning::after {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: 50%;
-  --bw: 3px;
-  background:
-    linear-gradient(to right, rgba(250,204,21,0) 0%, rgba(250,204,21,0.9) 65%, rgba(250,204,21,1) 100%) 100% 0/50% 100% no-repeat,
-    linear-gradient(to right, rgba(234,179,8,0.6) 50%, rgba(234,179,8,0) 95%) 0 0/50% 100% no-repeat;
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--bw)), #000 calc(100% - var(--bw)));
-          mask: radial-gradient(farthest-side, transparent calc(100% - var(--bw)), #000 calc(100% - var(--bw)));
-  animation: spin-rotate 1.1s linear infinite;
-  will-change: transform;
-}
-
-/* SVG spinner overlay for step circles */
-.step-spinner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 48px;
-  height: 48px;
-  pointer-events: none;
-}
-.step-spinner-primary {
-  filter: drop-shadow(0 0 6px rgba(59,130,246,0.45));
-}
-.step-spinner-warning {
-  filter: drop-shadow(0 0 6px rgba(234,179,8,0.45));
-}
-
-.spin-rotate {
-  animation: spin-rotate 1.2s linear infinite;
-  transform-origin: 50% 50%;
+  background-color: rgb(var(--c-bg-inner));
+  border: 2px solid #eab308;
 }
 
 .step-circle-inactive {
@@ -747,20 +661,3 @@ input[type=number] {
 	border: 2px solid rgb(var(--c-bg-alt));
 }
 
-.shake {
-  position: relative;
-}
-.shake::after {
-  content: '';
-  position: absolute;
-  inset: -6px;
-  border-radius: inherit;
-  background: radial-gradient(120px 60px at 50% 50%, rgba(var(--c-primary)/0.35), transparent 60%);
-  animation: ripple 600ms ease-out;
-  pointer-events: none;
-}
-
-@keyframes ripple {
-  from { opacity: .5; transform: scale(0.95); }
-  to { opacity: 0; transform: scale(1.2); }
-}

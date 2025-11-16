@@ -100,7 +100,7 @@ export default function OrderPage() {
                     </button>
                 </div>
                 
-                <div className="bg-bg-alt rounded-lg mb-8">
+                    <div className="bg-bg-alt rounded-lg mb-8">
                     <div className="flex items-center justify-between mb-2">
                         <h2 className="text-xl font-semibold">Статус доставки</h2>
                         <Chip classes={phase==='delivered'?'bg-green-500/20 text-green-400 border border-green-500/40': hasDelay?'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40':'bg-primary/20 text-primary border border-primary/40'}>
@@ -218,6 +218,7 @@ export default function OrderPage() {
                                     setTeleporting(true);
                                     try {
                                         await apiPost(`/orders/${id}/teleport`, { feeConfirmed: true });
+                                        setState(prev => ({ ...(prev || {}), phase: 'delivered' }));
                                         notify.success('Заказ успешно телепортирован!');
                                         setShowTeleportModal(false);
                                     } catch (err) {

@@ -102,10 +102,11 @@ export default function ProductPage() {
 	
 	return (
 		<>
+			<div className="max-w-6xl mx-auto">
 			<Breadcrumb items={[{ label: 'Главная', href: '/' }, { label: 'Каталог', href: '/catalog' }, { label: product?.name || 'Товар' }]} />
-			<div className="grid md:grid-cols-2 gap-8">
-				<div>
-					<div className="aspect-square bg-bg-inner rounded-box overflow-hidden">
+			<div className="grid md:grid-cols-2 gap-8 items-start">
+				<div className="flex justify-center">
+					<div className="aspect-square bg-bg-inner rounded-box overflow-hidden max-h-[90vh] w-full max-w-xl">
 						<ImageWithPlaceholder src={product.images?.[0]?.url} />
 					</div>
 				</div>
@@ -273,6 +274,7 @@ export default function ProductPage() {
 					
 				</div>
 			</div>
+			</div>
 			
             <div className="mt-12 space-y-6">
                 <h3 className="text-2xl font-bold uppercase tracking-wide">ОТЗЫВЫ</h3>
@@ -361,7 +363,7 @@ export default function ProductPage() {
 			</div>
 
 			{recommendedProducts.length > 0 && (
-				<div className="mt-16">
+				<div className="mt-16 max-w-6xl mx-auto">
 					<h2 className="text-3xl font-bold uppercase tracking-wide mb-8">РЕКОМЕНДУЕМЫЕ ТОВАРЫ</h2>
 				<div className="grid-products">
 						{recommendedProducts.slice(0, 3).map((p: any) => (
@@ -390,7 +392,7 @@ export default function ProductPage() {
 				</div>
 			)}
 
-            <div className="mt-16">
+            <div className="mt-16 max-w-6xl mx-auto">
                 <h2 className="text-3xl font-bold uppercase tracking-wide mb-8">ДРУГИЕ ТОВАРЫ</h2>
                 <div className="grid-products">
                     {randomProducts.map((p: any) => (

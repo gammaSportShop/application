@@ -77,7 +77,7 @@ export default function ProfilePage() {
 
     return (
         <div className="min-h-screen">
-            <div className="grid lg:grid-cols-2 min-h-screen">
+            <div className="grid lg:grid-cols-2">
                 <div className="flex items-center justify-center p-8 bg-bg-alt">
 					<div className="w-full max-w-md">
 						<div className="text-center mb-8">

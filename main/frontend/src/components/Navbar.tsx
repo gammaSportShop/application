@@ -85,7 +85,7 @@ export default function Navbar() {
                             <span className="hidden sm:inline">АККАУНТ</span>
                         </button>
                         {isDropdownOpen && (
-                            <ul className="absolute right-0 mt-2 p-2 shadow menu rounded-box w-56 glass-surface border">
+                            <ul className="absolute right-0 mt-2 p-2 shadow menu rounded-box w-56 border">
                                 {isLoggedIn ? (
                                     <>
                                         <li><Link to="/account" onClick={() => setIsDropdownOpen(false)}><UserCircle size={16} className="mr-2" />Дашборд</Link></li>

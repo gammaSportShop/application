@@ -34,7 +34,6 @@ export default function ProductCard({ product, isWished = false, onToggleWish, v
     const notify = useNotify()
     const tagMap = useMetaTagMap()
 	const { getItemQuantity, updateItemQuantity, isUpdating } = useCart()
-	const [shake, setShake] = useState(false)
 
 	const quantity = getItemQuantity(product.id)
 	const hasDiscount = typeof product.originalPrice === 'number' && (product.originalPrice as number) > product.price
@@ -50,8 +49,6 @@ export default function ProductCard({ product, isWished = false, onToggleWish, v
 		if (isUpdating) return
 		await updateItemQuantity(product.id, newQuantity)
 		if (newQuantity > quantity) {
-			setShake(true)
-			setTimeout(() => setShake(false), 500)
 			notify.success('Товар добавлен в корзину')
 		}
 	}
@@ -135,7 +132,7 @@ export default function ProductCard({ product, isWished = false, onToggleWish, v
 				{!wide && <div className="flex-grow" />}
 				<div className="mt-auto flex items-center justify-between flex-wrap mb-3 gap-2">
 							<div className="flex items-baseline gap-2">
-							<p className="text-2xl font-bold text-blue-400">${product.price}</p>
+							<p className="text-2xl font-bold text-primary">${product.price}</p>
 						<span className={`text-sm ${hasDiscount ? 'line-through opacity-60' : 'opacity-0 select-none'}`}>${hasDiscount ? product.originalPrice : product.price}</span>
 					</div>
 					{Array.isArray((product as any).features) && (product as any).features.length > 0 && (
@@ -148,7 +145,7 @@ export default function ProductCard({ product, isWished = false, onToggleWish, v
 						</div>
 					)}
 							{hasDiscount ? (
-								<span className="text-sm px-2 py-1 rounded-md border border-blue-600/40 text-blue-400 bg-blue-600/20 font-semibold">-{Math.round((((product.originalPrice as number) - product.price) / (product.originalPrice as number)) * 100)}%</span>
+								<span className="text-sm px-2 py-1 rounded-md border border-primary/40 text-primary bg-primary/20 font-semibold">-{Math.round((((product.originalPrice as number) - product.price) / (product.originalPrice as number)) * 100)}%</span>
 					) : (
 						<span className="text-sm px-2 py-1 rounded-md border border-transparent opacity-0 select-none">-0%</span>
 					)}
@@ -159,7 +156,7 @@ export default function ProductCard({ product, isWished = false, onToggleWish, v
 						СМОТРЕТЬ
 					</Link>
 					{quantity > 0 ? (
-						<div className={`flex items-center border-primary rounded-md ${shake ? 'shake' : ''}`}>
+						<div className="flex items-center border-primary rounded-md">
 							<button onClick={() => handleUpdateQuantity(quantity - 1)} className="btn btn-ghost p-2" disabled={isUpdating}><Minus size={16} /></button>
 							<span className="font-bold text-primary w-8 text-center">{quantity}</span>
 							<button onClick={() => handleUpdateQuantity(quantity + 1)} className="btn btn-ghost p-2" disabled={isUpdating}><Plus size={16} /></button>
